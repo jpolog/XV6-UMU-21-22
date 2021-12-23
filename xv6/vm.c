@@ -57,7 +57,7 @@ walkpgdir(pde_t *pgdir, const void *va, int alloc)
 // Create PTEs for virtual addresses starting at va that refer to
 // physical addresses starting at pa. va and size might not
 // be page-aligned.
-static int
+int
 mappages(pde_t *pgdir, void *va, uint size, uint pa, int perm)
 {
   char *a, *last;
@@ -173,6 +173,7 @@ switchuvm(struct proc *p)
   // forbids I/O instructions (e.g., inb and outb) from user space
   mycpu()->ts.iomb = (ushort) 0xFFFF;
   ltr(SEG_TSS << 3);
+  // Cambia el TLB
   lcr3(V2P(p->pgdir));  // switch to process's address space
   popcli();
 }

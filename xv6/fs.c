@@ -385,21 +385,47 @@ bmap(struct inode *ip, uint bn)
 
   if(bn < NINDIRECT){
     // Load indirect block, allocating if necessary.
+    // el BSI estaba creado?
     if((addr = ip->addrs[NDIRECT]) == 0)
       ip->addrs[NDIRECT] = addr = balloc(ip->dev);
+    // Lee el bloque y lo mete en bp
+      // Leer el bloque BSI del disco
     bp = bread(ip->dev, addr);
+    // Coge los datos del disco y los convierte a un array de enteros sin signo. Podemos acceder a los elementos como a[0], a[1], etc.
     a = (uint*)bp->data;
+    // a[0] es el siguiente??
     if((addr = a[bn]) == 0){
       a[bn] = addr = balloc(ip->dev);
+      // informa de que ha modificado el bloque
       log_write(bp);
     }
+    // Informa de que ya no lo necesita
     brelse(bp);
     return addr;
   }
 
+ bn -= NINDIRECT;
+  // tratar el BDI
+  // Siguiente al numero de nodos creado(NDIRECT) = BSI
+  // quitamos los que ya hemos asignado
+  if (bn < NINDIRECT*NINDIRECT){
+    // Comprobar si el BDI está asignado
+    // ver el número del BSI dentro del BDI
+    // ver si ese BSI se ha creado
+    // calcular qué entrada del BSI tienes que coger, y si no está asignada,
+    // asignarla con balloc y retornarla
+    if((addr = ip->addrs[NDIRECT+1])== 0)
+      ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
+    // repetir otra vez el codigo de BSI desde bread hasta brelse
+  }
+
+
+  // Coge los datos del disco y los convierte a un array de enteros sin signo
+
   panic("bmap: out of range");
 }
 
+// Sirve para borrar
 // Truncate inode (discard contents).
 // Only called when the inode has no links
 // to it (no directory entries referring to it)
@@ -411,14 +437,14 @@ itrunc(struct inode *ip)
   int i, j;
   struct buf *bp;
   uint *a;
-
+  // Borra todos los bloques directos
   for(i = 0; i < NDIRECT; i++){
     if(ip->addrs[i]){
       bfree(ip->dev, ip->addrs[i]);
       ip->addrs[i] = 0;
     }
   }
-
+// Igual que los directos, pero si existe lo tienes que leer, recorrer las entradas y si no esta a 0, ponerla a 0, y luego borrar el bloque simplemente indirecto(BSI)
   if(ip->addrs[NDIRECT]){
     bp = bread(ip->dev, ip->addrs[NDIRECT]);
     a = (uint*)bp->data;
@@ -429,6 +455,20 @@ itrunc(struct inode *ip)
     brelse(bp);
     bfree(ip->dev, ip->addrs[NDIRECT]);
     ip->addrs[NDIRECT] = 0;
+  }
+
+  // si existe el bdi
+  if(ip->addrs[NDIRECT+1])
+  {
+    //Mismo que con BSI, él lo ha convertido en una función
+    bp = bread(ip->dev, ip->addrs[NDIRECT]);
+    a = (uint*)bp->data;
+    // lees bdi
+    for(j=0; j<NINDIRECT; ++j){
+      if(a[j])
+      freebsi(ip->dev, a[j]);
+    }
+    // añadir brelse?
   }
 
   ip->size = 0;

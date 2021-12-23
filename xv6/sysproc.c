@@ -36,6 +36,25 @@ sys_kill(void)
   return kill(pid);
 }
 
+// int date(struct rtcdate*)
+int
+sys_date(void)
+{
+  struct rtcdate *r;
+  // obtener el puntero que el usuario puso originalmente
+  //Funciones argXXXX
+  //argint -> entero
+  //argfd -> descriptor de fichero
+  //argptr ->  puntero
+  if (argptr(0, (void **)&r, sizeof(struct rtcdate *)) < 0)
+  {
+    return -1;
+  };
+
+  cmostime(r);
+  return 0;
+}
+
 int
 sys_getpid(void)
 {
@@ -51,8 +70,13 @@ sys_sbrk(void)
   if(argint(0, &n) < 0)
     return -1;
   addr = myproc()->sz;
-  if(growproc(n) < 0)
-    return -1;
+
+
+  myproc()->sz += n;
+
+//  if(growproc(n) < 0)
+//    return -1;
+// 
   return addr;
 }
 

@@ -2,28 +2,29 @@ struct stat;
 struct rtcdate;
 
 // system calls
-extern int fork(void);
-extern int exit(void) __attribute__((noreturn));
-extern int wait(void);
-extern int pipe(int*);
-extern int write(int, const void*, int);
-extern int read(int, void*, int);
+extern int chdir(const char*);
 extern int close(int);
-extern int kill(int);
+extern int date(struct rtcdate *);
+extern int dup(int);
+extern int dup2(int, int);
 extern int exec(char*, char**);
-extern int open(const char*, int);
-extern int mknod(const char*, short, short);
-extern int unlink(const char*);
+extern int exit(int) __attribute__((noreturn));
+extern int fork(void);
 extern int fstat(int fd, struct stat*);
+extern int getpid(void);
+extern int kill(int);
 extern int link(const char*, const char*);
 extern int mkdir(const char*);
-extern int chdir(const char*);
-extern int dup(int);
-extern int getpid(void);
+extern int mknod(const char*, short, short);
+extern int open(const char*, int);
+extern int pipe(int*);
+extern int read(int, void*, int);
 extern char* sbrk(int);
 extern int sleep(int);
+extern int unlink(const char*);
 extern int uptime(void);
-
+extern int wait(int);
+extern int write(int, const void*, int);
 // ulib.c
 extern int stat(const char*, struct stat*);
 extern char* strcpy(char*, const char*);

@@ -74,9 +74,22 @@ trap(struct trapframe *tf)
   case T_IRQ0 + 7:
   case T_IRQ0 + IRQ_SPURIOUS:
     cprintf("cpu%d: spurious interrupt at %x:%x\n",
-            cpuid(), tf->cs, tf->eip);
+		    cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+  case T_PGFLT:
+    {
+	    //Obtener un nuevo marco de página para la página virtual (kalloc)
+	    //llamar a mappages para mapear esa página
+
+	    char * mem = kalloc();
+
+	    mappages(myproc()->pgdir, (char*)PGROUNDDOWN(rcr2()),
+			    PGSIZE,
+			    V2P(mem),
+			    PTE_W|PTE_U);
+    }
+
 
   //PAGEBREAK: 13
   default:
@@ -91,7 +104,6 @@ trap(struct trapframe *tf)
             "eip 0x%x addr 0x%x--kill proc\n",
             myproc()->pid, myproc()->name, tf->trapno,
             tf->err, cpuid(), tf->eip, rcr2());
-    myproc()->killed = 1;
   }
 
   // Force process exit if it has been killed and is in user space.

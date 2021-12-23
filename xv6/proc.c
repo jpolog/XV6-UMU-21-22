@@ -223,16 +223,16 @@ fork(void)
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
-// until its parent calls wait() to find out it exited.
+// until its parent calls wait(0) to find out it exited.
 void
-exit(void)
+exit(void) 
 {
   struct proc *curproc = myproc();
   struct proc *p;
   int fd;
 
   if(curproc == initproc)
-    panic("init exiting");
+    panic("init exiting");  
 
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
@@ -242,6 +242,8 @@ exit(void)
     }
   }
 
+//Obs: En algún punto de por aquí debe establecer el valor de salida
+
   begin_op();
   iput(curproc->cwd);
   end_op();
@@ -249,7 +251,7 @@ exit(void)
 
   acquire(&ptable.lock);
 
-  // Parent might be sleeping in wait().
+  // Parent might be sleeping in wait(0).
   wakeup1(curproc->parent);
 
   // Pass abandoned children to init.
@@ -263,6 +265,9 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+  deallocuvm(curproc->pgdir, curproc->sz, 0);
+  curproc->sz = 0;
+  switchuvm(curproc);
   sched();
   panic("zombie exit");
 }

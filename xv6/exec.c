@@ -43,28 +43,32 @@ exec(char *path, char **argv)
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, (char*)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
-    if(ph.type != ELF_PROG_LOAD || ph.memsz == 0)
+      // Comprobamos que la linea que tenemos que cargar es de tipo load
+    if(ph.type != ELF_PROG_LOAD)
       continue;
     if(ph.memsz < ph.filesz)
       goto bad;
     if(ph.vaddr + ph.memsz < ph.vaddr)
       goto bad;
+      // Allocvm genera paginas para la parte inicial del codigo y los datos
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
       goto bad;
     if(ph.vaddr % PGSIZE != 0)
       goto bad;
+      // Lee a partir del fichero, lee la sección y lo pone en la memoria que acaba de reservar
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
   end_op();
   ip = 0;
-
+  // Aquí ya ha tardado de poner el programa en memoria. Ahora está creando la pila
   // Allocate two pages at the next page boundary.
   // Make the first inaccessible.  Use the second as the user stack.
-  sz = PGROUNDUP(sz);
+  sz = PGROUNDUP(sz); //Llegar hasta el siguiente redondeo de página
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
+  //Esta función se usa para que esta página no la pueda usar el usuario
   clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
   sp = sz;
 
@@ -94,6 +98,8 @@ exec(char *path, char **argv)
   safestrcpy(curproc->name, last, sizeof(curproc->name));
 
   // Commit to the user image.
+  //Obs: Las llamadas al sistema se tienen que implementar de forma que hasta que no se comprueba todo no se realiza la llamada
+  //Todo esto lo ha hecho en una página que todavía no formaba parte del proceso. En este bloque se sustituye la tabla de páginas por la que hemos hecho nosotros una vez hechas las comprobaciones adecuadas.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;
   curproc->sz = sz;

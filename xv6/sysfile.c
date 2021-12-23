@@ -67,6 +67,20 @@ sys_dup(void)
 }
 
 int
+sys_dup2(void)
+{
+  // 1. Comprobar que oldfd es un archivo válido (argfd)
+  // 2. Comprobar que el segundo arg. es válido para albergar un fichero (argint)
+  // 3. Si oldfd == newfd ==> return newfd;
+
+
+  // 4. Si newfd está abierto ==> cerrarlo (fileclose)
+  // 5. Duplicarlo parecido a dup 
+  // 6. return newfd;
+  return 0;
+}
+
+int
 sys_read(void)
 {
   struct file *f;
