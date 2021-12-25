@@ -1,6 +1,13 @@
 struct stat;
 struct rtcdate;
 
+// Macros ejercicio 3 sesión 2
+# define WIFEXITED ( status )   ((( status ) & 0 x7f ) == 0)
+# define WEXITSTATUS ( status ) ((( status ) & 0 xff00 ) >> 8)
+# define WIFSIGNALED ( status ) ((( status ) & 0 x7f ) != 0)
+# define WEXITTRAP ( status )   ((( status ) & 0 x7f ) - 1)
+
+
 // system calls
 extern int chdir(const char*);
 extern int close(int);
@@ -8,7 +15,7 @@ extern int date(struct rtcdate *);
 extern int dup(int);
 extern int dup2(int, int);
 extern int exec(char*, char**);
-extern int exit(int) __attribute__((noreturn));
+extern int exit(int); 
 extern int fork(void);
 extern int fstat(int fd, struct stat*);
 extern int getpid(void);
@@ -23,7 +30,7 @@ extern char* sbrk(int);
 extern int sleep(int);
 extern int unlink(const char*);
 extern int uptime(void);
-extern int wait(int);
+extern int wait(int*);
 extern int write(int, const void*, int);
 // ulib.c
 extern int stat(const char*, struct stat*);

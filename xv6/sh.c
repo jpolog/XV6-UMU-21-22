@@ -146,7 +146,7 @@ main(void)
 {
   static char buf[100];
   int fd;
-
+  int status; // Almacena el estado del proceso
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
     if(fd >= 3){
@@ -166,7 +166,8 @@ main(void)
     }
     if(fork1() == 0)
       runcmd(parsecmd(buf));
-    wait(0);
+    wait(&status);
+    printf("Output code: %d", status);
   }
   exit(0);
 }

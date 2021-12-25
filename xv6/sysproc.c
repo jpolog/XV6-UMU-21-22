@@ -14,16 +14,26 @@ sys_fork(void)
 }
 
 int
-sys_exit(void)
+sys_exit(void)  //// Aquí deberíamos poner int?? 
 {
-  exit();
+
+  int exit_status;
+  argint(0, &exit_status);  // Almacenamos el primer argumento en exit_status 
+
+  if(exit_status < 0)// Se comprueba si se ha pasado algún argumento 
+      exit(0);
+  exit(exit_status);
+  
   return 0;  // not reached
 }
 
 int
 sys_wait(void)
 {
-  return wait();
+  int* status;
+  argptr(0, (void**) &status,sizeof(int*));
+
+  return wait(status);
 }
 
 int
@@ -40,8 +50,8 @@ sys_kill(void)
 int
 sys_date(void)
 {
-  struct rtcdate *r;
-  // obtener el puntero que el usuario puso originalmente
+    struct rtcdate *r;
+    // obtener el puntero que el usuario puso originalmente
   //Funciones argXXXX
   //argint -> entero
   //argfd -> descriptor de fichero
