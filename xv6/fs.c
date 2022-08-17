@@ -457,6 +457,7 @@ itrunc(struct inode *ip)
     ip->addrs[NDIRECT] = 0;
   }
 
+/**
   // si existe el bdi
   if(ip->addrs[NDIRECT+1])
   {
@@ -470,6 +471,7 @@ itrunc(struct inode *ip)
     }
     // añadir brelse?
   }
+*/
 
   ip->size = 0;
   iupdate(ip);

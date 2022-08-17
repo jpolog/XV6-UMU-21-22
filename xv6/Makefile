@@ -170,8 +170,14 @@ mkfs: mkfs.c fs.h
 
 UPROGS=\
 	_big\
-	_cat\
 	_dup2test\
+	_exitwait\
+	_tsbrk1\
+	_tsbrk2\
+	_tsbrk3\
+	_tsbrk4\
+	_tsbrk5\
+	_cat\
 	_date\
 	_echo\
 	_forktest\

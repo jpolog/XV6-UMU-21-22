@@ -2,10 +2,12 @@ struct stat;
 struct rtcdate;
 
 // Macros ejercicio 3 sesión 2
-# define WIFEXITED ( status )   ((( status ) & 0 x7f ) == 0)
-# define WEXITSTATUS ( status ) ((( status ) & 0 xff00 ) >> 8)
-# define WIFSIGNALED ( status ) ((( status ) & 0 x7f ) != 0)
-# define WEXITTRAP ( status )   ((( status ) & 0 x7f ) - 1)
+
+
+# define WIFEXITED ( status )   ((( status )&0x7f ) == 0)
+# define WEXITSTATUS ( status ) ((( status )&0xff00 ) >> 8)
+# define WIFSIGNALED ( status ) ((( status )&0x7f ) != 0)
+# define WEXITTRAP ( status )   ((( status )&0x7f ) - 1)
 
 
 // system calls
@@ -15,7 +17,7 @@ extern int date(struct rtcdate *);
 extern int dup(int);
 extern int dup2(int, int);
 extern int exec(char*, char**);
-extern int exit(int); 
+extern int exit(int) __attribute__((noreturn)); 
 extern int fork(void);
 extern int fstat(int fd, struct stat*);
 extern int getpid(void);

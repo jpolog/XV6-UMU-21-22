@@ -69,15 +69,31 @@ sys_dup(void)
 int
 sys_dup2(void)
 {
+  struct file *f, *fold;
+  int oldfd;
+  int newfd;
   // 1. Comprobar que oldfd es un archivo válido (argfd)
+  if(argfd(0, &oldfd, &f) < 0)
+    return -1;
   // 2. Comprobar que el segundo arg. es válido para albergar un fichero (argint)
+  if(argint(1, &newfd) < 0)
+    return -1;
   // 3. Si oldfd == newfd ==> return newfd;
-
+  if(oldfd == newfd)
+    return newfd;
 
   // 4. Si newfd está abierto ==> cerrarlo (fileclose)
+  // fold es el fichero que esta almacenado en newfd
+
+  if((fold = (myproc()->ofile[newfd])) != 0){
+    fileclose(fold);
+  }
   // 5. Duplicarlo parecido a dup 
+  myproc()->ofile[newfd] = f;
+  filedup(f);
+
   // 6. return newfd;
-  return 0;
+  return newfd;
 }
 
 int

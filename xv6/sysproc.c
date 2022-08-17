@@ -19,9 +19,9 @@ sys_exit(void)  //// Aquí deberíamos poner int??
 
   int exit_status;
   argint(0, &exit_status);  // Almacenamos el primer argumento en exit_status 
-
-  if(exit_status < 0)// Se comprueba si se ha pasado algún argumento 
-      exit(0);
+/**
+  if(exit_status < 0) Se comprueba si se ha pasado algún argumento ??? 
+      exit(0);*/
   exit(exit_status);
   
   return 0;  // not reached
@@ -31,7 +31,8 @@ int
 sys_wait(void)
 {
   int* status;
-  argptr(0, (void**) &status,sizeof(int*));
+  if (argptr(0, (void**) &status,sizeof(int*)) < 0)
+    return -1;
 
   return wait(status);
 }
